@@ -33,6 +33,7 @@ namespace AgentAdminCore.Controllers
 
         }
         [HttpPut]
+        [Route("{idleCode}")]
         public async Task<ActionResult<int>> UpdateIdleCode(IdleCode idleCode)
         {
             if (await _idleCodeRepository.UpdateIdleCode(idleCode) > 0)

@@ -15,6 +15,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SpaServices;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
+using AgentAdminCore.Controllers;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
+using Serilog;
 
 namespace AgentAdminCore
 {
@@ -28,9 +33,18 @@ namespace AgentAdminCore
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
+        //register the interface in ConfigureServices
         public void ConfigureServices(IServiceCollection services)
         {
-
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options =>
+            {
+                options.Authority = "https://dev-pp8wtzbc.us.auth0.com/";
+                options.Audience = "https://localhost:44308/IdleCode";
+            });
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
@@ -42,16 +56,22 @@ namespace AgentAdminCore
             services.AddSingleton<IInstallVersionRepository, InstallVersionRepository>();
         }
 
+        //Middleware component in core has acess to both incoming req and outgoing response
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        //Sets up a request processing pipepline with n middleware pieces defined in Configure
+        //1)Use UseDeveloperExceptionPage
+        //2)UseSwagger, UseHttpsRedirection, UseAuthorization, UseSpa
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseSerilogRequestLogging();
+            app.UseAuthentication();
+            app.UseAuthorization();
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "AgentAdminCore v1"));
             }
-
             app.UseHttpsRedirection();
 
             app.UseRouting();

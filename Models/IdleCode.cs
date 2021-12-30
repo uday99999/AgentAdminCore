@@ -24,6 +24,6 @@ namespace AgentAdminCore.Models
         [JsonPropertyName("is_default")]
         public bool IsDefault { get; set; }
         [JsonPropertyName("timer_format")]
-        public int TimerFormat { get; set; }
+        public byte TimerFormat { get; set; }
     }
 }

@@ -1,6 +1,8 @@
 ﻿using AgentAdminCore.Common;
 using AgentAdminCore.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,9 +15,11 @@ namespace AgentAdminCore.Controllers
     public class ApplicationController : Controller
     {
         private readonly IApplicationRepository _applicationRepository;
-        public ApplicationController(IApplicationRepository applicationRepository)
+        private readonly ILogger<ApplicationController> _logger;
+        public ApplicationController(IApplicationRepository applicationRepository,ILogger<ApplicationController> logger)
         {
             _applicationRepository = applicationRepository;
+            _logger = logger;
         }
         [HttpGet]
         public async Task<ActionResult<List<Application>>> GetApplications()
@@ -27,9 +31,12 @@ namespace AgentAdminCore.Controllers
         {
             if(await _applicationRepository.AddApplication(application))
             {
+                _logger.LogInformation("Created Record");
                 return Created("", 200);
             }
-                return new StatusCodeResult(500);
+           
+            return new StatusCodeResult(500);
+            
         }
         [HttpPut]
         public async Task<ActionResult<int>> UpdateApplication(Application application)

@@ -1,5 +1,6 @@
 ﻿using AgentAdminCore.Common;
 using AgentAdminCore.Models;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -12,9 +13,11 @@ namespace AgentAdminCore.Data
     public class ApplicationRepository : IApplicationRepository
     {
         private readonly IAppSettings _appSettings;
-        public ApplicationRepository(IAppSettings appSettings)
+        private readonly ILogger<ApplicationRepository> _logger;
+        public ApplicationRepository(IAppSettings appSettings, ILogger<ApplicationRepository> logger)
         {
             _appSettings = appSettings;
+            _logger = logger;
         }
         public async Task<List<Application>> GetApplications()
         {
@@ -42,6 +45,7 @@ namespace AgentAdminCore.Data
                     }
                 }
             }
+            _logger.LogInformation("Applications:" + applications);
             return applications;
         }
         public async Task<bool> AddApplication(Application application)
