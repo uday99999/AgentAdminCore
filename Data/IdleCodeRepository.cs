@@ -109,5 +109,40 @@ namespace AgentAdminCore.Data
             }
             return idleCodes;
         }
+        public async Task<IdleCode> GetIdleCodes(int ID)
+        {
+            var idleCode = new IdleCode();
+
+            using (var con = new SqlConnection(_appSettings.AgentAdminCoreConnectionString))
+            {
+                using (var cmd = con.CreateCommand())
+                {
+                    cmd.CommandText = @"SELECT ID, Name, Description, ModifiedBy, ModifiedOn, ReasonCode, IsDefault, TimerFormat FROM IdleCode WHERE ID =@ID";
+                    cmd.Parameters.Add(new SqlParameter("@ID", SqlDbType.Int) { Value = ID });
+                    //open the connection 
+
+                    await con.OpenAsync();
+                    //executing the command
+                    using (var dr = await cmd.ExecuteReaderAsync())
+                    {
+                        while (await dr.ReadAsync())
+                        {
+                            return new IdleCode()
+                            {
+                                ID = dr["ID"] as int? ?? 0,
+                                Name = dr["Name"] as string ?? string.Empty,
+                                Description = dr["Description"] as string ?? string.Empty,
+                                ModifiedBy = dr["ModifiedBy"] as string ?? string.Empty,
+                                ModifiedOn = dr["ModifiedOn"] as DateTime? ?? DateTime.MinValue,
+                                ReasonCode = dr["ReasonCode"] as int? ?? 0,
+                                IsDefault = dr["IsDefault"] as bool? ?? false,
+                                TimerFormat = dr["TimerFormat"] as byte? ?? 0
+                            };
+                        }
+                    }
+                }
+            }
+            return idleCode;
+        }
     }
 }

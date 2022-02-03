@@ -16,7 +16,7 @@ namespace AgentAdminCore.Models
         [JsonPropertyName("description")]
         public string Description { get; set; }
         [JsonPropertyName("modified_by")]
-        public string ModifiedBy { get; set; }
+        public string? ModifiedBy { get; set; }
         [JsonPropertyName("modified_on")]
         public DateTime ModifiedOn { get; set; }
         [JsonPropertyName("reason_code")]

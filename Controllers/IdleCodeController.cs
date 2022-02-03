@@ -18,10 +18,18 @@ namespace AgentAdminCore.Controllers
             _idleCodeRepository = idleCodeRepository;
         }
         [HttpGet]
+        [Route("GetIdleCodes")]
         public async Task<ActionResult<List<IdleCode>>> GetIdleCodes()
         {
             return Ok(await _idleCodeRepository.GetIdleCodes());
         }
+        [HttpGet]
+        [Route("GetIdleCodes/{idleCodeId}")]
+        public async Task<ActionResult<IdleCode>> GetIdleCodes(int idleCodeId)
+        {
+            return Ok(await _idleCodeRepository.GetIdleCodes(idleCodeId));
+        }
+
         [HttpPost]
         public async Task<ActionResult<bool>> AddIdleCode(IdleCode idleCode)
         {
@@ -33,7 +41,7 @@ namespace AgentAdminCore.Controllers
 
         }
         [HttpPut]
-        [Route("{idleCode}")]
+        //[Route("{idleCode}")]
         public async Task<ActionResult<int>> UpdateIdleCode(IdleCode idleCode)
         {
             if (await _idleCodeRepository.UpdateIdleCode(idleCode) > 0)
@@ -52,6 +60,7 @@ namespace AgentAdminCore.Controllers
                 return NoContent();
             }
             return new StatusCodeResult(500);
+
         }
     }
 }

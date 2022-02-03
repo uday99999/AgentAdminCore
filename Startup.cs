@@ -36,6 +36,10 @@ namespace AgentAdminCore
         //register the interface in ConfigureServices
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSpaStaticFiles(configuration =>
+            {
+                configuration.RootPath = "client-app/build";
+            });
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -82,6 +86,8 @@ namespace AgentAdminCore
             {
                 endpoints.MapControllers();
             });
+            app.UseStaticFiles();
+            app.UseSpaStaticFiles();
             app.UseSpa(spa =>
             {
                 spa.Options.SourcePath = "client-app";
