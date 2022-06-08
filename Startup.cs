@@ -36,10 +36,7 @@ namespace AgentAdminCore
         //register the interface in ConfigureServices
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSpaStaticFiles(configuration =>
-            {
-                configuration.RootPath = "client-app/build";
-            });
+          
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -49,15 +46,27 @@ namespace AgentAdminCore
                 options.Authority = "https://dev-pp8wtzbc.us.auth0.com/";
                 options.Audience = "https://localhost:44308/IdleCode";
             });
-            services.AddControllers();
+            services.AddControllersWithViews();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "AgentAdminCore", Version = "v1" });
             });
             services.AddSingleton<IAppSettings, AppSettings>();
-            services.AddSingleton<IIdleCodeRepository, IdleCodeRepository>();
+            services.AddTransient<IIdleCodeRepository, IdleCodeRepository>();
             services.AddSingleton<IApplicationRepository, ApplicationRepository>();
             services.AddSingleton<IInstallVersionRepository, InstallVersionRepository>();
+            services.AddSingleton<ITenantRepository, TenantRepository>();
+            //services.AddSession(options =>
+            //{
+            //    options.IdleTimeout = TimeSpan.FromMinutes(1);
+            //    options.Cookie.HttpOnly = true;
+            //    options.Cookie.IsEssential = true;
+            //});
+            services.AddSpaStaticFiles(configuration =>
+            {
+                configuration.RootPath = "client-app/build";
+            });
+
         }
 
         //Middleware component in core has acess to both incoming req and outgoing response
@@ -77,24 +86,38 @@ namespace AgentAdminCore
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "AgentAdminCore v1"));
             }
             app.UseHttpsRedirection();
+            app.UseStaticFiles();
+            app.UseSpaStaticFiles();
 
             app.UseRouting();
-
+            app.UseAuthentication();
             app.UseAuthorization();
+
+            //usesession between routing and endpoints
+            //app.UseSession();
+
+            //This must be after session
+            //app.UseUserManagement();
+
+
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                //endpoints.MapControllerRoute(
+                //    name: "default",
+                //    pattern: "{controller}/{action=Index}/{id?}");
             });
-            app.UseStaticFiles();
-            app.UseSpaStaticFiles();
+           
             app.UseSpa(spa =>
             {
                 spa.Options.SourcePath = "client-app";
+
                 if (env.IsDevelopment())
                 {
                     spa.UseReactDevelopmentServer(npmScript: "start");
                 }
+                
             });
         }
     }

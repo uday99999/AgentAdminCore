@@ -70,6 +70,7 @@ namespace AgentAdminCore.Data
                     cmd.Parameters.Add("@ID", SqlDbType.Int).Value = ID;
                     await con.OpenAsync();
                     var result = await cmd.ExecuteNonQueryAsync();
+                    await con.CloseAsync();
                     return result;
                 }
             }
@@ -105,6 +106,7 @@ namespace AgentAdminCore.Data
                             idleCodes.Add(ic);   
                         }
                     }
+                    await con.CloseAsync();
                 }
             }
             return idleCodes;
@@ -117,8 +119,9 @@ namespace AgentAdminCore.Data
             {
                 using (var cmd = con.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT ID, Name, Description, ModifiedBy, ModifiedOn, ReasonCode, IsDefault, TimerFormat FROM IdleCode WHERE ID =@ID";
-                    cmd.Parameters.Add(new SqlParameter("@ID", SqlDbType.Int) { Value = ID });
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.CommandText = "getDetails";
+                    cmd.Parameters.Add("@IdleCodeId", SqlDbType.Int).Value = ID;
                     //open the connection 
 
                     await con.OpenAsync();
@@ -140,6 +143,7 @@ namespace AgentAdminCore.Data
                             };
                         }
                     }
+                    await con.CloseAsync();
                 }
             }
             return idleCode;
